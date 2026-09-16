@@ -1,0 +1,25 @@
+services:
+  blog-backend:
+    image: lixing609/blog-backend:v2
+    container_name: blog-backend
+    #ports:
+    #  - "8080:8080"
+    volumes:
+      # SQLite 数据库持久化，关键！
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    environment:
+      # 覆盖 Spring 配置中的数据库路径
+      - SPRING_DATASOURCE_URL=jdbc:sqlite:/app/data/user.db
+      # JWT 密钥建议通过环境变量注入
+      - JWT_SECRET=your-256-bit-secret-key-here
+    restart: unless-stopped
+
+  blog-frontend:
+    image: lixing609/blog-frontend:v1
+    container_name: blog-frontend
+    ports:
+      - "80:80"          # 前端对外暴露 80
+    depends_on:
+      - blog-backend
+    restart: unless-stopped
